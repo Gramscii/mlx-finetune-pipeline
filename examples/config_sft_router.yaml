@@ -1,0 +1,22 @@
+# EXAMPLE — SFT for a query ROUTER (multi-label tool selection, 10 languages).
+# The answer is a comma-separated route list, or EMPTY = abstention.
+# Long prompts (route-sets of up to ~30 tools): max_seq_length raised — with
+# the generic 512 the longest measured example (~1 100 tokens) gets truncated.
+model: models/your-base-model
+data: data/sft-router
+adapter_path: adapters/router-sft
+train: true
+fine_tune_type: lora
+mask_prompt: true
+
+num_layers: 16
+iters: 12000               # 24k rows × 2 epochs / batch 4
+batch_size: 4
+learning_rate: 1e-5
+steps_per_report: 100
+steps_per_eval: 500
+save_every: 500
+val_batches: 25
+max_seq_length: 1280
+grad_checkpoint: true
+seed: 42

@@ -1,0 +1,21 @@
+# Stage 1 — CPT (Continued Pre-Training), OPTIONAL. Skip with
+# `./run_pipeline.sh --skip-cpt` when the base model already knows your
+# domain's language (e.g. fine-tuning a classifier on ordinary text).
+# Data: data/cpt/{train,valid}.jsonl with {"text": "raw domain text ..."}.
+model: models/your-base-model
+data: data/cpt
+adapter_path: adapters/stage1-cpt
+train: true
+fine_tune_type: lora
+
+num_layers: 16
+iters: 2000
+batch_size: 2
+learning_rate: 5.0e-6    # keep the decimal point: YAML parses bare `5e-6` as a string
+steps_per_report: 100
+steps_per_eval: 500
+save_every: 500
+val_batches: 25
+max_seq_length: 1024
+grad_checkpoint: true
+seed: 42

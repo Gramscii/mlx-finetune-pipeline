@@ -1,0 +1,37 @@
+# Stage 3 — GRPO (grpo_train.py). Paper defaults: arXiv:2509.13081.
+# IMPORTANT: point model_path at the FUSED SFT model (README — Known Issues).
+model_path: models/fused-sft
+data_path: data/sft/train.jsonl
+adapter_dir: adapters/stage3-grpo
+results_path: grpo_results.json
+log_path: logs/grpo_train.log
+
+# Reward (rewards.py): exact_match | exact_match_set | semantic | paper_blend.
+# exact_match is deterministic and language-agnostic — right for classifiers
+# and routers (short or empty gold answers). semantic/paper_blend need
+# reward_options.encoder_model and `pip install sentence-transformers`
+# (checked at startup: the run fails FAST, not at iteration 1).
+reward: paper_blend
+reward_options:
+  encoder_model: sentence-transformers/all-MiniLM-L6-v2
+  # format_regexes: ["<answer>.*?</answer>"]
+  # reasoning_regex: "<think>(.*?)</think>"
+
+n_candidates: 6          # paper: K = 6
+clip_eps: 0.2            # paper: ε = 0.2
+kl_coeff: 0.05           # paper: β = 0.05 · set 0 to skip loading the reference model
+temperature: 0.7         # paper: fixed (no adaptive-temperature mechanism exists)
+max_tokens: 256
+min_response_length: 0   # DO NOT raise for short-answer datasets (README)
+
+n_iters: 200
+batch_size: 2
+learning_rate: 1.0e-6   # keep the decimal point: YAML parses bare `1e-6` as a string
+lora_layers: 16
+lora_rank: 32            # paper: r = 32
+lora_scale: 2.0          # paper: α = 64 → scale = α / r
+lora_dropout: 0.0
+max_seq_length: 2048
+early_stop_patience: 8
+early_stop_warmup: 10
+seed: 42

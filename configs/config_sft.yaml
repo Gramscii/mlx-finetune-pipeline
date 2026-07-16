@@ -1,0 +1,24 @@
+# Stage 2 — SFT (Supervised Fine-Tuning) for `python -m mlx_lm lora -c`.
+# Data: data/sft/{train,valid}.jsonl with {"messages":[system,user,assistant]}.
+model: models/your-base-model
+data: data/sft
+adapter_path: adapters/stage2-sft
+train: true
+fine_tune_type: lora
+mask_prompt: true            # learn ONLY on the assistant answer
+
+num_layers: 16
+# iters = (dataset_size × epochs) / batch_size
+# e.g. 24 000 rows × 2 epochs at batch 4 → 12 000
+iters: 12000
+batch_size: 4
+learning_rate: 1.0e-5    # keep the decimal point: YAML parses bare `1e-5` as a string
+steps_per_report: 100
+# keep steps_per_eval == save_every: every evaluated iteration then has its own
+# numbered checkpoint, so best_checkpoint.py can pick the true val-loss minimum.
+steps_per_eval: 500
+save_every: 500
+val_batches: 25
+max_seq_length: 512          # raise for long-prompt tasks (see examples/)
+grad_checkpoint: true
+seed: 42

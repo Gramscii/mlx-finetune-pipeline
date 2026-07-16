@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+models/
+adapters/
+data/
+logs/
+grpo_results.json
+*.log
+.DS_Store

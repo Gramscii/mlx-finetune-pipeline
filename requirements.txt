@@ -1,0 +1,11 @@
+# Core (Apple Silicon)
+mlx>=0.21
+# >=0.23 required: `python -m mlx_lm` (mlx_lm/__main__.py) and the
+# `mask_prompt` config key do not exist in earlier releases.
+mlx-lm>=0.23
+numpy
+pyyaml
+
+# Optional — only for the `semantic` / `paper_blend` rewards (the default
+# configs/config_grpo.yaml uses paper_blend, so install it for the stock run):
+#   pip install sentence-transformers

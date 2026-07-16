@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this pipeline, please cite the paper it implements."
+title: "MLX Fine-Tuning Pipeline (CPT - SFT - GRPO)"
+authors:
+  - family-names: Marras
+    given-names: Roberto
+license: MIT
+repository-code: "https://github.com/Gramscii/mlx-finetune-pipeline"
+preferred-citation:
+  type: article
+  title: "Shaping Explanations: Semantic Reward Modeling with Encoder-Only Transformers for GRPO"
+  authors:
+    - family-names: Pappone
+      given-names: Francesco
+    - family-names: Lazzaroni
+      given-names: Ruggero Marino
+    - family-names: Califano
+      given-names: Federico
+    - family-names: Gentile
+      given-names: "Niccolò"
+    - family-names: Marras
+      given-names: Roberto
+  year: 2025
+  url: "https://arxiv.org/abs/2509.13081"
