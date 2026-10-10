@@ -73,12 +73,40 @@ Selected by `reward:` in the GRPO config (`rewards.py`):
   N-numbered checkpoint just after it: the selected file is one optimizer step past the
   validated weights — a uniform skew that leaves the ranking meaningful.
 
+## Qwen3.5 and other gated-delta models
+
+`mlx_lm` runs the linear-attention layers of Qwen3.5 (Gated DeltaNet) through a Metal kernel
+with no backward pass, so in training mode it falls back to a loop over every token: memory and
+time grow with the sequence until a 4,096-token step no longer fits a 64 GB Mac.
+`chunked_delta.py` computes the same recurrence in chunks of 64 tokens, as matrix products MLX
+can differentiate, and patches `mlx_lm` to use it whenever the kernel is off (training only):
+
+```bash
+python chunked_delta.py -c configs/config_sft.yaml   # = python -m mlx_lm lora, with the patch
+```
+
+One LoRA step of Qwen3.5-4B (bf16, rank 16, every layer, gradient checkpointing) on an
+M4 Pro with 64 GB:
+
+| tokens | token loop | chunked |
+|---|---|---|
+| 2,048 | 42.8 GiB, 13 tok/s | 11.4 GiB, 160 tok/s |
+| 4,096 | out of memory | 14.8 GiB, 110 tok/s |
+| 8,192 | out of memory | 25.5 GiB, 76 tok/s |
+
+With LoRA on the top 16 layers only, 4,096 tokens train at about 220 tok/s. Past 8K the full
+attention layers dominate (16,384 tokens: 60 GiB).
+
 ## Tests
 
 ```bash
-pytest tests/            # rewards, advantages, masking spans, checkpoint selection
+pytest tests/            # rewards, advantages, masking spans, checkpoint selection, chunked delta rule
 bash -n run_pipeline.sh
 ```
+
+`tests/test_chunked_delta.py` checks the chunked rule against `mlx_lm`'s token loop (outputs,
+final state, gradients, masks, an ill-conditioned chunk) and a small Qwen3.5 trained both ways;
+it needs `mlx-lm`.
 
 The differentiable loss needs MLX at runtime; everything around it is pure Python and covered
 by the suite.
